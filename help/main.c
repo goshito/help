@@ -8,7 +8,7 @@
  * File:   main.c
  * Author: georgi
  *
- * Created on March 3, 2016, 12:03 PM
+ * Created on March 3, 2016, 12:13 PM
  */
 
 #include <stdio.h>
