@@ -1,25 +1,38 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/* 
- * File:   main.c
- * Author: georgi
- *
- * Created on March 3, 2016, 12:13 PM
- */
-
+#include <termios.h>
 #include <stdio.h>
-#include <stdlib.h>
 
-/*
- * 
- */
-int main(int argc, char** argv) {
-    printf("blsh blsh");
+static struct termios old, new;
 
-    return (EXIT_SUCCESS);
+/* Initialize new terminal i/o settings */
+void initTermios(int echo) {
+    tcgetattr(0, &old); /* grab old terminal i/o settings */
+    new = old; /* make new settings same as old settings */
+    new.c_lflag &= ~ICANON; /* disable buffered i/o */
+    new.c_lflag &= echo ? ECHO : ~ECHO; /* set echo mode */
+    tcsetattr(0, TCSANOW, &new); /* use these new terminal i/o settings now */
 }
 
+/* Restore old terminal i/o settings */
+void resetTermios(void) {
+    tcsetattr(0, TCSANOW, &old);
+}
+
+/* Read 1 character - echo defines echo mode */
+char getch_(int echo) {
+    char ch;
+    initTermios(echo);
+    ch = getchar();
+    resetTermios();
+    return ch;
+}
+
+int main() {
+    int c;
+    
+    while ((c = getch_(1)) != EOF) {
+        if (c == '\b')
+            printf("\\b");
+    }
+    
+    return 0;
+}
